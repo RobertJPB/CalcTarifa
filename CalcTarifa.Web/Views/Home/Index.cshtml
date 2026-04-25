@@ -1,0 +1,326 @@
+@model HomeVM
+@{
+    ViewData["Title"] = "Calcular Envío";
+}
+
+<style>
+    .field-validation-error {
+        display: block;
+        font-size: .75rem;
+        color: var(--error);
+        margin-top: .4rem;
+        font-weight: 600;
+        padding-left: .5rem;
+        border-left: 2px solid var(--error);
+    }
+    .input-validation-error {
+        border-color: var(--error) !important;
+        background-color: var(--error-bg) !important;
+    }
+</style>
+
+
+
+<div class="page-wrapper">
+
+    <div class="page-intro">
+        <h1>Calculador de Tarifas de Envío</h1>
+        <p>Selecciona el país de destino, ingresa el peso de tu paquete y obtén el costo de envío al instante.</p>
+    </div>
+
+    <div class="grid-main">
+
+        <!-- ── Panel Calculadora ─────────────────────────────────── -->
+        <div class="calc-panel">
+            <div class="panel-head">
+                <div class="panel-head-dot"></div>
+                <h2>Datos del envío</h2>
+            </div>
+            <div class="panel-body">
+                <form asp-controller="Home" asp-action="Calcular" method="post" novalidate id="calcForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Paso 1: Destino -->
+                    <p class="section-label">Paso 1 — Destino</p>
+                    <div class="form-field" style="margin-bottom:1.5rem">
+                        <label asp-for="Formulario.Region"></label>
+                        <div class="select-wrapper">
+                            <select asp-for="Formulario.Region" id="Formulario_Region" class="form-select">
+                                <option value="">Seleccionar país de destino</option>
+                                @if (Model.Tarifas.Any())
+                                {
+                                    @foreach (var t in Model.Tarifas)
+                                    {
+                                        <option value="@((int)t.Region)">@t.NombrePais</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option disabled>Error: No se pudieron cargar los países. Verifica el API.</option>
+                                }
+                            </select>
+                        </div>
+                        <span asp-validation-for="Formulario.Region" class="field-validation-error"></span>
+                    </div>
+
+                    <!-- Paso 2: Peso con toggle KG/LB -->
+                    <p class="section-label">Paso 2 — Peso del paquete</p>
+                    <div class="weight-group">
+                        <div class="weight-row">
+                            <div class="weight-input-wrap" id="weightWrap">
+                                <input type="text"
+                                       id="pesoDisplay"
+                                       class="weight-input"
+                                       placeholder="0.00"
+                                       inputmode="decimal"
+                                       autocomplete="off" />
+                                
+                                <select id="unidadSelect" class="unit-dropdown" onchange="actualizarUnidad()">
+                                    <option value="kg">KG</option>
+                                    <option value="lb">LB</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input asp-for="Formulario.Peso" type="hidden" id="pesoHidden" />
+                        <input asp-for="Formulario.Unidad" type="hidden" id="unidadHidden" />
+                        <input asp-for="Formulario.PesoIngresado" type="hidden" id="pesoIngresadoHidden" />
+                        <p class="weight-hint" id="weightHint">Mínimo 0.001 kg — Máximo 1,000 kg.</p>
+                        <span asp-validation-for="Formulario.PesoKg" class="field-validation-error" id="pesoError"></span>
+                    </div>
+
+                    <button type="submit" class="btn-calcular" id="btnCalcular">
+                        Calcular Envío
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Panel Resultado ───────────────────────────────────── -->
+        <div class="result-panel">
+            @if (Model.TieneResultado)
+            {
+                var r = Model.Resultado!;
+                <div class="result-details">
+                    <div class="detail-row result-main-row">
+                        <span class="dk">Resultado</span>
+                        <span class="dv result-main-amount">$@r.CostoTotal.ToString("N2") <small>USD</small></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="dk">Destino</span>
+                        <span class="dv">@r.Region</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="dk">Peso</span>
+                        <span class="dv">@r.PesoVisual.ToString("0.##") @r.Unidad.ToUpper()</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="dk">Tarifa aplicada</span>
+                        <span class="dv">$@r.TarifaPorKg.ToString("N2") USD / kg</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="dk">Fecha</span>
+                        <span class="dv">@r.FechaCalculo.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+                <div class="result-actions" style="display: block;">
+                    <button type="button" class="btn-action btn-print-alt" onclick="window.print()" style="width: 100%;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                        Imprimir
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="result-empty">
+                    @if (!ViewData.ModelState.IsValid && Context.Request.Method == "POST")
+                    {
+                        <div class="error-msg-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <p>No se pudo generar la cotización. Revisa los errores en el formulario.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Ingresa destino y peso para ver tu cotización</p>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- ── Historial ─────────────────────────────────────────────── -->
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <section class="historial-section">
+            <div class="historial-header">
+                <h2>Cálculos Recientes</h2>
+
+            </div>
+
+            @if (Model.Historial.Any())
+            {
+                <div class="historial-grid">
+                    @foreach (var h in Model.Historial)
+                    {
+                        <article class="historial-item">
+                            <div class="hi-main">
+                                <span class="hi-dest"><span class="badge-region">@h.Region</span></span>
+                                <span class="hi-costo">$@h.CostoTotal.ToString("N2")</span>
+                                <span class="hi-detalle">Peso: @h.PesoKg.ToString("0.##") kg</span>
+                                <span class="hi-fecha">Fecha: @h.FechaCalculo.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <button type="button" class="btn-hi-print" onclick="window.print()" title="Imprimir">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                                Imprimir
+                            </button>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="historial-empty">Aún no hay cálculos registrados.</div>
+            }
+        </section>
+    }
+    else
+    {
+        <section class="historial-section guest-msg">
+            <div class="guest-banner">
+                <p><strong>¿Sabías que puedes guardar tu historial?</strong> <a asp-controller="Auth" asp-action="Registro">Regístrate</a> o <a asp-controller="Auth" asp-action="Login">inicia sesión</a> para ver tus cotizaciones pasadas.</p>
+            </div>
+        </section>
+    }
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+    (function () {
+        var regionSelected = false;
+        var pesoValido     = false;
+        var unidad         = 'kg';          // 'kg' | 'lb'
+        var LB_A_KG        = 0.453592;
+
+        // ── Cambio de unidad ───────────────────────────────────────
+        window.actualizarUnidad = function () {
+            var select = document.getElementById('unidadSelect');
+            unidad = select.value;
+            
+            var limMax = unidad === 'kg' ? '1,000 kg' : '2,204 lb';
+            var limMin = unidad === 'kg' ? '0.001 kg' : '0.002 lb';
+            document.getElementById('weightHint').textContent =
+                'Mínimo ' + limMin + ' — Máximo ' + limMax + '.';
+
+            // Re-validar con el mismo valor visible
+            var raw = document.getElementById('pesoDisplay').value;
+            if (raw) validarPeso(raw);
+        };
+
+        // ── Dropdown país ──────────────────────────────────────────
+        var selectEl = document.getElementById('Formulario_Region');
+        if (selectEl) {
+            if (selectEl.value) regionSelected = true;
+            selectEl.addEventListener('change', function () {
+                regionSelected = this.value !== '';
+                if (regionSelected) {
+                    var regionError = document.querySelector('[data-valmsg-for="Formulario.Region"]');
+                    if (regionError) regionError.textContent = '';
+                }
+            });
+        }
+
+        // ── Entrada de peso ────────────────────────────────────────
+        var pesoDisplay = document.getElementById('pesoDisplay');
+        var pesoHidden  = document.getElementById('pesoHidden');
+        var weightWrap  = document.getElementById('weightWrap');
+        var pesoError   = document.getElementById('pesoError');
+
+        if (pesoDisplay) {
+            // Inicializar si ya hay un valor
+            var uHidden = document.getElementById('unidadHidden');
+            var pIngresado = document.getElementById('pesoIngresadoHidden');
+            var uSelect = document.getElementById('unidadSelect');
+            
+            if (uHidden && uHidden.value) {
+                unidad = uHidden.value;
+                if (uSelect) uSelect.value = unidad;
+                actualizarUnidad();
+            }
+            
+            if (pIngresado && pIngresado.value) { 
+                pesoDisplay.value = pIngresado.value; 
+                pesoValido = true; 
+            } else if (pesoHidden.value) { 
+                var initialVal = parseFloat(pesoHidden.value);
+                pesoDisplay.value = isNaN(initialVal) ? '' : initialVal; 
+                pesoValido = true; 
+            }
+
+            pesoDisplay.addEventListener('input', function () {
+                var raw = this.value.replace(',', '.').replace(/[^\d.]/g, '');
+                var parts = raw.split('.');
+                if (parts.length > 2) raw = parts[0] + '.' + parts.slice(1).join('');
+                this.value = raw;
+                validarPeso(raw);
+            });
+        }
+
+        function validarPeso(raw) {
+            var num = parseFloat(raw);
+            weightWrap.classList.remove('error-field');
+            pesoError.textContent = '';
+            pesoValido = false;
+
+            var maxInput = (unidad === 'lb') ? 2204.62 : 1000;
+            var unitLabel = unidad.toUpperCase();
+
+            if (!raw || isNaN(num)) {
+                pesoError.textContent = 'Por favor, ingresa un peso válido.';
+                weightWrap.classList.add('error-field');
+                pesoHidden.value = '';
+            } else if (num <= 0) {
+                pesoError.textContent = 'El peso debe ser mayor a cero.';
+                weightWrap.classList.add('error-field');
+                pesoHidden.value = '';
+            } else if (num > maxInput) {
+                pesoError.textContent = 'El peso no puede superar los ' + maxInput.toLocaleString() + ' ' + unitLabel + '.';
+                weightWrap.classList.add('error-field');
+                pesoHidden.value = '';
+            } else {
+                // Guardar para el servidor
+                document.getElementById('pesoHidden').value = num.toString();
+                document.getElementById('unidadHidden').value = unidad;
+                document.getElementById('pesoIngresadoHidden').value = num.toString();
+                pesoValido = true;
+            }
+        }
+
+        // ── Validación al enviar ───────────────────────────────────
+        var form = document.getElementById('calcForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (pesoDisplay) validarPeso(pesoDisplay.value);
+                
+                var selectEl = document.getElementById('Formulario_Region');
+                if (selectEl && !selectEl.value) {
+                    regionSelected = false;
+                    var regionError = document.querySelector('[data-valmsg-for="Formulario.Region"]');
+                    if (regionError) {
+                        regionError.textContent = 'Por favor, selecciona un país de destino.';
+                    }
+                }
+                
+                if (!regionSelected || !pesoValido) {
+                    e.preventDefault();
+                    // Optional: You could add a quick shake animation or alert here if you want it to be more aggressive
+                }
+            });
+        }
+        // ── Inicialización forzada ────────────────────────────────
+        actualizarUnidad();
+    })();
+    </script>
+}

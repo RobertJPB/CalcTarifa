@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Solo referencia los DTOs del BusinessApplication para los modelos de request/response -->
+    <ProjectReference Include="..\CalcTarifa.BusinessApplication\CalcTarifa.BusinessApplication.csproj" />
+  </ItemGroup>
+</Project>

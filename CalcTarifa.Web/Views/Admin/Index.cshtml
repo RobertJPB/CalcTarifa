@@ -1,0 +1,203 @@
+@model List<TarifaVM>
+@{
+    ViewData["Title"] = "Gestión de Tarifas";
+}
+
+
+<div class="page-wrapper" style="padding-top: 1.25rem;">
+    <header class="admin-page-header">
+        <div class="aph-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+        <div class="aph-text">
+            <h1>Administración de Sistema</h1>
+            <p>Configuración global de tarifas y regiones</p>
+        </div>
+    </header>
+    <div class="admin-container">
+        <div class="panel-head">
+            <div class="panel-head-dot"></div>
+            <h2>Tarifas Vigentes</h2>
+        </div>
+        
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <div class="tarifas-list">
+            @foreach (var t in Model)
+            {
+                <div class="tarifa-card">
+                    <div class="tarifa-info">
+                        <h3>@t.NombrePais</h3>
+
+                    </div>
+                    <div class="tarifa-actions">
+                        <form asp-action="Actualizar" method="post" class="tarifa-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="region" value="@((int)t.Region)" />
+                            <div class="input-group">
+                                <span class="currency-prefix">$</span>
+                                <input type="number" name="nuevaTarifa" value="@t.TarifaPorKg" step="0.01" class="form-input" required />
+                                <span class="currency-suffix">USD / kg</span>
+                            </div>
+                            <button type="submit" class="btn-save">Guardar</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a asp-controller="Home" asp-action="Index" class="btn-back">Volver al Calculador</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-container {
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 0;
+        box-shadow: var(--shadow);
+    }
+    .tarifas-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: .5rem;
+    }
+    .tarifa-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem;
+        border: 1px solid var(--n-200);
+        border-radius: 0;
+        transition: all .2s;
+    }
+    .tarifa-card:hover {
+        border-color: var(--g-300);
+        background: var(--n-50);
+    }
+    .tarifa-info h3 { margin: 0; font-size: 1.1rem; color: var(--n-900); }
+    .tarifa-info p { margin: .25rem 0 0; font-size: .85rem; color: var(--n-500); }
+    
+    .tarifa-form {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .input-group {
+        display: flex;
+        align-items: center;
+        background: var(--white);
+        border-radius: 6px;
+        padding: 0 .75rem;
+        border: 1px solid var(--n-300);
+        transition: border-color .2s, box-shadow .2s;
+    }
+    .input-group:focus-within {
+        border-color: var(--g-500);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .input-group .form-input {
+        background: transparent;
+        border: none;
+        width: 80px;
+        padding: .5rem;
+        font-weight: 700;
+        text-align: right;
+    }
+    .currency-prefix, .currency-suffix { font-size: .8rem; font-weight: 600; color: var(--n-600); }
+    
+    .btn-save {
+        background: var(--g-600);
+        color: var(--white);
+        border: none;
+        padding: .6rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    .btn-save:hover { background: var(--g-700); }
+    
+    .btn-back {
+        color: var(--g-600);
+        text-decoration: none;
+        font-size: .9rem;
+        font-weight: 600;
+        transition: color .2s;
+    }
+    .btn-back:hover { color: var(--g-700); text-decoration: underline; }
+
+    .tarifa-actions {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+    .btn-delete {
+        background: transparent;
+        color: var(--n-400);
+        border: 1px solid var(--n-200);
+        width: 38px;
+        height: 38px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .btn-delete:hover {
+        background: #fee2e2;
+        color: #ef4444;
+        border-color: #fecaca;
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    .admin-page-header {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+    .aph-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--g-100);
+        color: var(--g-700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+    .aph-text h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--n-900);
+        margin: 0;
+        letter-spacing: -.02em;
+    }
+    .aph-text p {
+        font-size: .85rem;
+        color: var(--n-500);
+        margin: .1rem 0 0;
+        font-weight: 500;
+    }
+</style>

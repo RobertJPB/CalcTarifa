@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Calculador de Tarifas</title>
+    <meta name="description" content="Calculadora de tarifas de envío internacional. Calcula el costo de tu paquete a India, Estados Unidos y Reino Unido." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <span class="logo-text">Calculador de Tarifas</span>
+            </a>
+            
+            <nav class="header-nav">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="user-profile">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Index" class="btn-admin">Gestionar</a>
+                        }
+                        <span class="user-name">@User.Identity.Name</span>
+                        <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline">
+                            <button type="submit" class="btn-logout">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Salir
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="Login">Iniciar Sesión</a>
+                    <a asp-controller="Auth" asp-action="Registro" class="btn-small">Registrarse</a>
+                }
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
