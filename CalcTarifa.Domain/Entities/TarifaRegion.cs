@@ -1,4 +1,5 @@
 using CalcTarifa.Domain.Enums;
+using CalcTarifa.Domain.Validations;
 
 namespace CalcTarifa.Domain.Entities
 {
@@ -16,9 +17,9 @@ namespace CalcTarifa.Domain.Entities
         public TarifaRegion(RegionEnvio region, string nombrePais, decimal tarifaPorKg)
         {
             if (string.IsNullOrWhiteSpace(nombrePais))
-                throw new CalcTarifa.Domain.DomainValidationException("El nombre del país es obligatorio.");
+                throw new DomainValidationException("El nombre del país es obligatorio.");
             if (tarifaPorKg <= 0)
-                throw new CalcTarifa.Domain.DomainValidationException("La tarifa debe ser mayor a cero.");
+                throw new DomainValidationException("La tarifa debe ser mayor a cero.");
 
             Region      = region;
             NombrePais  = nombrePais.Trim();
@@ -29,7 +30,7 @@ namespace CalcTarifa.Domain.Entities
         public void ActualizarTarifa(decimal nuevaTarifa)
         {
             if (nuevaTarifa <= 0)
-                throw new CalcTarifa.Domain.DomainValidationException("La tarifa debe ser mayor a cero.");
+                throw new DomainValidationException("La tarifa debe ser mayor a cero.");
             TarifaPorKg = nuevaTarifa;
         }
 

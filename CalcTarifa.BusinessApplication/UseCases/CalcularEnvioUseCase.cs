@@ -6,6 +6,7 @@ using CalcTarifa.Domain.Entities;
 using CalcTarifa.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using CalcTarifa.BusinessApplication.Mappings;
+using CalcTarifa.Domain.Validations;
 
 namespace CalcTarifa.BusinessApplication.UseCases
 {
@@ -37,7 +38,7 @@ namespace CalcTarifa.BusinessApplication.UseCases
                     : PesoKg.Crear(request.Peso);
 
                 var tarifa = await _uow.Tarifas.ObtenerPorRegionAsync(request.Region)
-                    ?? throw new CalcTarifa.Domain.EntityNotFoundException("TarifaRegion", request.Region);
+                    ?? throw new EntityNotFoundException("TarifaRegion", request.Region);
 
                 var costo = _calculadora.Calcular(peso, tarifa);
 

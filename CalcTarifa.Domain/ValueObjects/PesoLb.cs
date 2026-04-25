@@ -1,3 +1,5 @@
+using CalcTarifa.Domain.Validations;
+
 namespace CalcTarifa.Domain.ValueObjects
 {
     // representa un peso en libras validado

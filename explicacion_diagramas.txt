@@ -1,0 +1,7 @@
+¡Qué bueno que los diagramas te hayan servido! Aquí tienes una explicación detallada para cada uno, resaltando su propósito y lo que representan en tu sistema:
+
+### 1. Diagrama de Diseño de la Solución (Visión General)
+Este diagrama describe el **flujo lógico de datos** desde que el usuario interactúa con la aplicación hasta que obtiene un resultado. Representa la "experiencia del proceso": el usuario ingresa datos en la web, el sistema valida y normaliza las unidades (convirtiendo libras a kilogramos si es necesario), consulta la tarifa vigente en la base de datos y ejecuta el cálculo. Es ideal para entender cómo viaja la información entre el frontend, el backend y la base de datos de manera secuencial.
+
+### 2. Diagrama en Capas (Arquitectura Limpia)
+<truncated 1225 bytes>

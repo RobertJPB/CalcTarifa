@@ -1,5 +1,6 @@
 using CalcTarifa.Domain.Enums;
 using CalcTarifa.Domain.ValueObjects;
+using CalcTarifa.Domain.Validations;
 
 namespace CalcTarifa.Domain.Entities
 {
@@ -27,7 +28,7 @@ namespace CalcTarifa.Domain.Entities
             string?     userId = null)
         {
             if (!Enum.IsDefined(typeof(RegionEnvio), region))
-                throw new CalcTarifa.Domain.DomainValidationException("La región especificada no es válida.");
+                throw new DomainValidationException("La región especificada no es válida.");
 
             NombreCliente  = nombreCliente?.Trim() ?? string.Empty;
             EmailCliente   = emailCliente?.Trim().ToLowerInvariant() ?? string.Empty;

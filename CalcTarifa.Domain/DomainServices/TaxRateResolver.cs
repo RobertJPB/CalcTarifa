@@ -1,5 +1,6 @@
 using CalcTarifa.Domain.Enums;
 using CalcTarifa.Domain.DomainServices.Strategies;
+using CalcTarifa.Domain.Validations;
 
 namespace CalcTarifa.Domain.DomainServices
 {
@@ -22,7 +23,7 @@ namespace CalcTarifa.Domain.DomainServices
             var strategy = _strategies.FirstOrDefault(s => s.AplicaPara(region));
             
             if (strategy == null)
-                throw new CalcTarifa.Domain.DomainValidationException(
+                throw new DomainValidationException(
                     $"No existe una estrategia de cálculo definida para la región {region}.");
 
             return strategy;

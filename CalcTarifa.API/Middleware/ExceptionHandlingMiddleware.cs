@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using CalcTarifa.Domain;
+using CalcTarifa.Domain.Validations;
 
 namespace CalcTarifa.API.Middleware
 {

@@ -1,3 +1,5 @@
+using CalcTarifa.Domain.Validations;
+
 namespace CalcTarifa.Domain.ValueObjects
 {
     // representa un peso en kg validado
@@ -16,9 +18,9 @@ namespace CalcTarifa.Domain.ValueObjects
         private static void Validar(decimal valor)
         {
             if (valor <= 0)
-                throw new CalcTarifa.Domain.DomainValidationException("el peso debe ser mayor a cero");
+                throw new DomainValidationException("el peso debe ser mayor a cero");
             if (valor > 1000)
-                throw new CalcTarifa.Domain.DomainValidationException("el peso no puede superar los 1000 kg");
+                throw new DomainValidationException("el peso no puede superar los 1000 kg");
         }
 
         public override bool Equals(object? obj) => obj is PesoKg other && Valor == other.Valor;
