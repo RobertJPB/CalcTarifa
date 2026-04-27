@@ -4,8 +4,8 @@ CalcTarifa es una solución integral diseñada para el cálculo preciso de tarif
 
 ##  Características Principales
 
-- **Cálculo Dinámico por Región**: Implementación de estrategias de costos específicas para regiones clave (India, Estados Unidos, Reino Unido, etc.).
-- **Gestión Multi-Unidad**: Soporte nativo para Kilogramos (Kg) y Libras (Lb) con normalización automática en la capa de dominio.
+- **Cálculo por Región**: Implementación de estrategias de costos específicas para regiones clave (India, Estados Unidos, Reino Unido, etc.).
+- **Gestión de Unidades**: Soporte nativo para Kilogramos (Kg) y Libras (Lb) con normalización automática en la capa de dominio.
 - **Panel Administrativo**: Gestión centralizada de tarifas vigentes por región.
 - **Historial de Consultas**: Registro detallado de cálculos realizados para auditoría y consulta de usuarios.
 - **Seguridad**: Autenticación robusta y gestión de roles para proteger las funciones administrativas.
@@ -13,7 +13,7 @@ CalcTarifa es una solución integral diseñada para el cálculo preciso de tarif
 
 ##  Arquitectura del Sistema
 
-El proyecto está construido siguiendo los principios de **Clean Architecture** (Arquitectura Limpia), lo que garantiza un bajo acoplamiento y una alta testabilidad.
+El proyecto está construido siguiendo los principios de Arquitectura Limpia, lo que garantiza un bajo acoplamiento y una alta testabilidad.
 
 ### Capas del Proyecto
 
@@ -30,7 +30,7 @@ El sistema destaca por el uso de patrones de diseño avanzados:
 - **Pattern Strategy**: Utilizado para resolver el cálculo de tarifas de forma dinámica según la región, permitiendo extender el sistema a nuevos países sin modificar la lógica existente.
 - **Value Objects**: El manejo de pesos se realiza mediante objetos de valor que encapsulan las reglas de validación y conversión, asegurando la integridad de los datos en todo el ciclo de vida de la solicitud.
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 - **Backend**: .NET 8, C#.
 - **Persistencia**: Entity Framework Core, SQL Server.
