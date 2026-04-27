@@ -31,11 +31,21 @@ El sistema destaca por el uso de patrones de diseño avanzados:
 - **Value Objects**: El manejo de pesos se realiza mediante objetos de valor que encapsulan las reglas de validación y conversión, asegurando la integridad de los datos en todo el ciclo de vida de la solicitud.
 
 ## Stack Tecnológico
-
 - **Backend**: .NET 8, C#.
 - **Persistencia**: Entity Framework Core, SQL Server.
 - **Seguridad**: ASP.NET Core Identity, JSON Web Tokens (JWT).
 - **Mapeo y Validación**: AutoMapper, FluentValidation.
 - **Frontend**: ASP.NET Core MVC, Vanilla CSS (fuente Outfit), JavaScript.
+
+
+## Principios SOLID Aplicados:
+S (Responsabilidad Única): Cada capa y clase tiene una función clara. Los Value Objects (PesoKg) validan, mientras que los Use Cases orquestan el negocio.
+O (Abierto/Cerrado): Gracias al Patrón Strategy, puedes añadir nuevas regiones de envío (ej. CalculoJapon) creando una clase nueva, sin modificar el código existente.
+L (Sustitución de Liskov): Todas las estrategias de cálculo implementan ICalculoTarifaStrategy, permitiendo que el sistema las use indistintamente sin errores.
+I (Segregación de Interfaces): Las interfaces son pequeñas y específicas (ej. ITaxRateResolver), evitando que las clases implementen métodos que no necesitan.
+D (Inversión de Dependencias): La lógica de negocio depende de interfaces, no de bases de datos. La infraestructura se inyecta, facilitando cambios tecnológicos futuros.
+
+
+
 
 
